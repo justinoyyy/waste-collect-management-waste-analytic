@@ -34,8 +34,8 @@ button {
 
 .sidebar h2 {
     text-align: center;
-    font-size: 19px;
-    line-height: 1.5;
+    font-size: 21px;
+    line-height: 1.4;
     color: #27392c;
 }
 
@@ -45,7 +45,7 @@ button {
     gap: 8px;
 }
 
-.nav-btn {
+.nav-link {
     border: none;
     border-radius: 5px;
     background: transparent;
@@ -56,21 +56,16 @@ button {
     line-height: 1.5;
 }
 
-.nav-btn:hover,
-.nav-btn.active {
+.nav-link:hover,
+.nav-link.active {
     background: #2e7d32;
-    color: #fff;
+    color: white;
 }
 
 .main-content {
     flex: 1;
     min-width: 0;
     padding: 24px;
-}
-
-.page[hidden],
-.form-card[hidden] {
-    display: none;
 }
 
 .page-header {
@@ -115,13 +110,13 @@ button {
 
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: 14px;
     margin-bottom: 22px;
 }
 
 .stat-card {
-    background: #fff;
+    background: white;
     border: 1px solid #e0e6e0;
     border-radius: 8px;
     padding: 20px 12px;
@@ -135,13 +130,13 @@ button {
 }
 
 .stat-card h2 {
-    color: #2e7d32;
     font-size: 23px;
+    color: #2e7d32;
     overflow-wrap: anywhere;
 }
 
 .card {
-    background: #fff;
+    background: white;
     border: 1px solid #e0e6e0;
     border-radius: 9px;
     padding: 22px;
@@ -154,6 +149,11 @@ button {
     font-size: 18px;
 }
 
+.collection-form[hidden],
+.page[hidden] {
+    display: none;
+}
+
 .form-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -161,31 +161,27 @@ button {
     margin-top: 22px;
 }
 
-.form-grid > div {
-    min-width: 0;
-}
-
-.form-grid .full {
-    grid-column: 1 / -1;
-}
-
-label {
+.form-grid label {
     display: block;
     font-size: 13px;
     font-weight: bold;
     margin-bottom: 9px;
 }
 
-input,
-select {
+.form-grid input,
+.form-grid select,
+.filters input,
+.filters select,
+.card-heading input,
+.period-select {
     width: 100%;
     min-width: 0;
     padding: 12px;
     border: 1px solid #dfe5df;
-    background: #f8faf8;
     border-radius: 6px;
-    font-size: 13px;
+    background: #f8faf8;
     color: #354238;
+    font-size: 13px;
 }
 
 input:focus,
@@ -210,7 +206,14 @@ select:focus {
 }
 
 .card-heading input {
-    max-width: 320px;
+    max-width: 300px;
+}
+
+.filters {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
 }
 
 .table-wrap {
@@ -224,8 +227,7 @@ table {
     text-align: left;
 }
 
-th,
-td {
+th, td {
     padding: 14px 10px;
     border-bottom: 1px solid #e8ede8;
     font-size: 12px;
@@ -241,6 +243,25 @@ td {
     color: #354238;
 }
 
+.status {
+    display: inline-block;
+    padding: 6px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    background: #e8f4e8;
+    color: #2e7d32;
+}
+
+.status.missed {
+    background: #fdecea;
+    color: #b52c22;
+}
+
+.status.in-progress {
+    background: #fff2d8;
+    color: #8a6200;
+}
+
 .delete-btn {
     background: #fbe9e7;
     color: #b52c22;
@@ -250,18 +271,124 @@ td {
     font-size: 11px;
 }
 
-.delete-btn:hover {
-    background: #f5d4d0;
-}
-
-.empty {
+.empty-message {
     padding: 24px 8px;
     color: #68736a;
     font-size: 13px;
 }
 
-.empty[hidden] {
+.empty-message[hidden] {
     display: none;
+}
+
+.analytics-stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.chart-card,
+.performance-card {
+    min-height: 230px;
+    margin-bottom: 0;
+}
+
+.chart-card > h2,
+.performance-card > h2 {
+    text-align: center;
+    text-transform: uppercase;
+    font-size: 15px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid #e8ede8;
+}
+
+.bar-chart {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding-top: 16px;
+}
+
+.bar-row {
+    display: grid;
+    grid-template-columns: 90px minmax(30px, 1fr) 65px;
+    align-items: center;
+    gap: 9px;
+    font-size: 12px;
+}
+
+.bar-label {
+    text-align: right;
+    overflow-wrap: anywhere;
+}
+
+.bar-track {
+    height: 13px;
+    background: #edf1ed;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.bar-fill {
+    height: 100%;
+    background: #2e7d32;
+    border-radius: 3px;
+}
+
+.bar-value {
+    font-size: 11px;
+}
+
+.category-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 15px 0;
+    font-size: 13px;
+}
+
+.category-dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: #39834a;
+    flex-shrink: 0;
+}
+
+.category-item:nth-child(2) .category-dot {
+    background: #77a86b;
+}
+
+.category-item:nth-child(3) .category-dot {
+    background: #a5b6a1;
+}
+
+.category-item:nth-child(4) .category-dot {
+    background: #c4cfc4;
+}
+
+.performance-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid #edf0ed;
+    font-size: 13px;
+}
+
+.performance-row strong {
+    color: #2e7d32;
+}
+
+.chart-empty {
+    color: #68736a;
+    font-size: 13px;
+    text-align: center;
+    padding: 28px 10px;
 }
 
 footer {
@@ -271,13 +398,17 @@ footer {
     font-size: 12px;
 }
 
-@media (max-width: 1000px) {
+@media (max-width: 1100px) {
     .sidebar {
         width: 200px;
     }
 
     .main-content {
         padding: 18px;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
     .form-grid {
@@ -314,16 +445,15 @@ footer {
         flex-direction: column;
     }
 
-    .stats-grid {
+    .stats-grid,
+    .analytics-stats {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .form-grid {
+    .form-grid,
+    .analytics-grid,
+    .filters {
         grid-template-columns: 1fr;
-    }
-
-    .form-grid .full {
-        grid-column: auto;
     }
 
     .card {
@@ -337,13 +467,5 @@ footer {
 
     .card-heading input {
         max-width: none;
-    }
-
-    .form-actions {
-        flex-direction: column;
-    }
-
-    .form-actions button {
-        width: 100%;
     }
 }
