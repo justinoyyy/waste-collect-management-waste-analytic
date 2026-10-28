@@ -1,229 +1,398 @@
 
-let packages = JSON.parse(localStorage.getItem("packages")) || [];
-let profiles = JSON.parse(localStorage.getItem("profiles")) || [];
+const storageKey = "wasteCollectionsV2";
+
+let collections = JSON.parse(localStorage.getItem(storageKey)) || [];
+
+let today = new Date();
+
+function saveCollections() {
+    localStorage.setItem(storageKey, JSON.stringify(collections));
+}
 
 function showPage(pageId, button) {
     document.querySelectorAll(".page").forEach(function(page) {
         page.hidden = page.id !== pageId;
     });
 
-    document.querySelectorAll(".nav-btn").forEach(function(btn) {
-        btn.classList.remove("active");
+    document.querySelectorAll(".nav-link").forEach(function(link) {
+        link.classList.remove("active");
     });
 
     button.classList.add("active");
+
+    if (pageId === "analytics") {
+        renderAnalytics();
+    }
 }
 
-function toggleForm(formId) {
-    let form = document.getElementById(formId);
+function toggleForm() {
+    let form = document.getElementById("collectionFormBox");
     form.hidden = !form.hidden;
 }
 
-function saveData() {
-    localStorage.setItem("packages", JSON.stringify(packages));
-    localStorage.setItem("profiles", JSON.stringify(profiles));
+function renderStats() {
+    document.getElementById("totalCount").textContent = collections.length;
+
+    document.getElementById("scheduledCount").textContent =
+        collections.filter(item => item.status === "Scheduled").length;
+
+    document.getElementById("progressCount").textContent =
+        collections.filter(item => item.status === "In Progress").length;
+
+    document.getElementById("completedCount").textContent =
+        collections.filter(item => item.status === "Completed").length;
+
+    document.getElementById("missedCount").textContent =
+        collections.filter(item => item.status === "Missed").length;
 }
 
-function addRow(list, values, deleteFunction) {
-    let row = document.createElement("tr");
+function renderLocations() {
+    let select = document.getElementById("filterLocation");
+    let selected = select.value;
 
-    for (let i = 0; i < values.length; i++) {
-        let cell = document.createElement("td");
-        cell.textContent = values[i];
-        row.appendChild(cell);
+    let locations = [...new Set(collections.map(item => item.location))];
+
+    select.innerHTML = '<option value="">All Locations</option>';
+
+    for (let i = 0; i < locations.length; i++) {
+        let option = document.createElement("option");
+        option.value = locations[i];
+        option.textContent = locations[i];
+        select.appendChild(option);
     }
 
-    let actionCell = document.createElement("td");
-    let button = document.createElement("button");
-
-    button.textContent = "Delete";
-    button.className = "delete-btn";
-
-    button.addEventListener("click", deleteFunction);
-
-    actionCell.appendChild(button);
-    row.appendChild(actionCell);
-    list.appendChild(row);
+    select.value = locations.includes(selected) ? selected : "";
 }
 
-function renderPackages(search = "") {
-    let list = document.getElementById("packageList");
-    let empty = document.getElementById("packageEmpty");
+function renderCollections() {
+    let list = document.getElementById("collectionList");
+    let search = document.getElementById("searchCollection").value.toLowerCase();
+    let location = document.getElementById("filterLocation").value;
+    let type = document.getElementById("filterType").value;
+    let status = document.getElementById("filterStatus").value;
 
     list.innerHTML = "";
 
-    let filtered = packages.filter(function(item) {
-        return (
-            item.name + " " +
-            item.code + " " +
-            item.description
-        ).toLowerCase().includes(search.toLowerCase());
+    let filtered = collections.filter(function(item) {
+        let text = Object.values(item).join(" ").toLowerCase();
+
+        return text.includes(search) &&
+            (!location || item.location === location) &&
+            (!type || item.type === type) &&
+            (!status || item.status === status);
     });
 
     for (let i = 0; i < filtered.length; i++) {
         let item = filtered[i];
+        let row = document.createElement("tr");
 
-        addRow(list, [
-            item.name,
-            item.code,
-            item.description
-        ], function() {
-            packages = packages.filter(function(pkg) {
-                return pkg.id !== item.id;
+        let values = [
+            item.id,
+            item.date,
+            item.location,
+            item.collector,
+            item.type,
+            item.vehicle,
+            Number(item.weight).toLocaleString() + " kg"
+        ];
+
+        for (let j = 0; j < values.length; j++) {
+            let cell = document.createElement("td");
+            cell.textContent = values[j];
+            row.appendChild(cell);
+        }
+
+        let statusCell = document.createElement("td");
+        let badge = document.createElement("span");
+
+        badge.className = "status";
+
+        if (item.status === "Missed") {
+            badge.classList.add("missed");
+        }
+
+        if (item.status === "In Progress") {
+            badge.classList.add("in-progress");
+        }
+
+        badge.textContent = item.status;
+        statusCell.appendChild(badge);
+        row.appendChild(statusCell);
+
+        let actionCell = document.createElement("td");
+        let deleteButton = document.createElement("button");
+
+        deleteButton.textContent = "Delete";
+        deleteButton.className = "delete-btn";
+
+        deleteButton.addEventListener("click", function() {
+            collections = collections.filter(function(record) {
+                return record.id !== item.id;
             });
 
-            saveData();
+            saveCollections();
             renderAll();
         });
+
+        actionCell.appendChild(deleteButton);
+        row.appendChild(actionCell);
+        list.appendChild(row);
     }
 
+    let empty = document.getElementById("emptyMessage");
     empty.hidden = filtered.length > 0;
 
-    empty.textContent = packages.length === 0
-        ? "No packages added yet."
-        : "No matching packages found.";
-
-    document.getElementById("packageCount").textContent =
-        packages.length;
-
-    document.getElementById("packageCodeCount").textContent =
-        new Set(packages.map(item => item.code.toLowerCase())).size;
+    if (collections.length === 0) {
+        empty.textContent = "No collections scheduled yet.";
+    } else {
+        empty.textContent = "No matching collection records found.";
+    }
 }
 
-function renderProfiles(search = "") {
-    let list = document.getElementById("profileList");
-    let empty = document.getElementById("profileEmpty");
+function getAnalyticsData() {
+    let period = document.getElementById("analyticsPeriod").value;
 
-    list.innerHTML = "";
+    return collections.filter(function(item) {
+        if (period === "all") {
+            return true;
+        }
 
-    let filtered = profiles.filter(function(item) {
-        return (
-            item.name + " " +
-            item.email + " " +
-            item.role + " " +
-            item.department
-        ).toLowerCase().includes(search.toLowerCase());
+        let date = new Date(item.date + "T12:00:00");
+
+        return date.getMonth() === today.getMonth() &&
+            date.getFullYear() === today.getFullYear();
+    });
+}
+
+function renderAnalytics() {
+    let data = getAnalyticsData();
+
+    let total = data.reduce(function(sum, item) {
+        return sum + Number(item.weight);
+    }, 0);
+
+    let recyclable = data
+        .filter(item => item.type === "Recyclable")
+        .reduce((sum, item) => sum + Number(item.weight), 0);
+
+    let completed = data.filter(item => item.status === "Completed").length;
+
+    let efficiency = data.length
+        ? Math.round(completed / data.length * 100)
+        : 0;
+
+    let days = new Set(data.map(item => item.date)).size;
+
+    document.getElementById("totalWaste").textContent =
+        total.toLocaleString() + " kg";
+
+    document.getElementById("averageWaste").textContent =
+        Math.round(total / Math.max(days, 1)).toLocaleString() + " kg";
+
+    document.getElementById("recyclableWaste").textContent =
+        recyclable.toLocaleString() + " kg";
+
+    document.getElementById("efficiency").textContent = efficiency + "%";
+
+    renderTrend(data);
+    renderCategories(data, total);
+    renderPerformance(data);
+    renderRanking(data);
+}
+
+function renderTrend(data) {
+    let chart = document.getElementById("trendChart");
+    chart.innerHTML = "";
+
+    let locations = {};
+
+    data.forEach(function(item) {
+        locations[item.location] = (locations[item.location] || 0) +
+            Number(item.weight);
     });
 
-    for (let i = 0; i < filtered.length; i++) {
-        let item = filtered[i];
+    let entries = Object.entries(locations)
+        .sort((a, b) => b[1] - a[1]);
 
-        addRow(list, [
-            item.name,
-            item.email,
-            item.role,
-            item.department
-        ], function() {
-            profiles = profiles.filter(function(profile) {
-                return profile.id !== item.id;
-            });
-
-            saveData();
-            renderAll();
-        });
+    if (entries.length === 0) {
+        chart.innerHTML = '<p class="chart-empty">No waste data available.</p>';
+        return;
     }
 
-    empty.hidden = filtered.length > 0;
+    let max = Math.max(...entries.map(item => item[1]), 1);
 
-    empty.textContent = profiles.length === 0
-        ? "No profiles added yet."
-        : "No matching profiles found.";
+    for (let i = 0; i < entries.length; i++) {
+        let row = document.createElement("div");
+        row.className = "bar-row";
 
-    document.getElementById("profileCount").textContent =
-        profiles.length;
+        let label = document.createElement("span");
+        label.className = "bar-label";
+        label.textContent = entries[i][0];
 
-    document.getElementById("adminCount").textContent =
-        profiles.filter(item => item.role === "Administrator").length;
+        let track = document.createElement("div");
+        track.className = "bar-track";
 
-    document.getElementById("departmentCount").textContent =
-        new Set(
-            profiles.map(item => item.department.toLowerCase())
-        ).size;
+        let fill = document.createElement("div");
+        fill.className = "bar-fill";
+        fill.style.width = (entries[i][1] / max * 100) + "%";
+
+        track.appendChild(fill);
+
+        let value = document.createElement("span");
+        value.className = "bar-value";
+        value.textContent = entries[i][1].toLocaleString() + " kg";
+
+        row.append(label, track, value);
+        chart.appendChild(row);
+    }
 }
 
-document.getElementById("packageForm").addEventListener(
-    "submit", function(event) {
-        event.preventDefault();
+function renderCategories(data, total) {
+    let chart = document.getElementById("categoryChart");
+    chart.innerHTML = "";
 
-        let name = document.getElementById("packageName").value.trim();
-        let code = document.getElementById("packageCode").value.trim();
-        let description = document.getElementById("packageDescription").value.trim();
+    let types = [
+        "Biodegradable",
+        "Recyclable",
+        "Residual",
+        "Hazardous"
+    ];
 
-        let duplicate = packages.some(function(item) {
-            return item.code.toLowerCase() === code.toLowerCase();
-        });
-
-        if (duplicate) {
-            alert("Package code already exists.");
-            return;
-        }
-
-        packages.push({
-            id: Date.now() + Math.random(),
-            name: name,
-            code: code,
-            description: description
-        });
-
-        saveData();
-        this.reset();
-
-        document.getElementById("packageFormBox").hidden = true;
-
-        renderAll();
+    if (data.length === 0) {
+        chart.innerHTML = '<p class="chart-empty">No waste data available.</p>';
+        return;
     }
-);
 
-document.getElementById("profileForm").addEventListener(
-    "submit", function(event) {
-        event.preventDefault();
+    for (let i = 0; i < types.length; i++) {
+        let weight = data
+            .filter(item => item.type === types[i])
+            .reduce((sum, item) => sum + Number(item.weight), 0);
 
-        let name = document.getElementById("fullName").value.trim();
-        let email = document.getElementById("email").value.trim();
-        let role = document.getElementById("role").value;
-        let department = document.getElementById("department").value.trim();
+        let percent = total ? Math.round(weight / total * 100) : 0;
 
-        let duplicate = profiles.some(function(item) {
-            return item.email.toLowerCase() === email.toLowerCase();
-        });
+        let row = document.createElement("div");
+        row.className = "category-item";
 
-        if (duplicate) {
-            alert("Email address already exists.");
-            return;
-        }
+        let dot = document.createElement("span");
+        dot.className = "category-dot";
 
-        profiles.push({
-            id: Date.now() + Math.random(),
-            name: name,
-            email: email,
-            role: role,
-            department: department
-        });
+        let text = document.createElement("span");
+        text.textContent = types[i] + " — " + percent + "% (" +
+            weight.toLocaleString() + " kg)";
 
-        saveData();
-        this.reset();
-
-        document.getElementById("profileFormBox").hidden = true;
-
-        renderAll();
+        row.append(dot, text);
+        chart.appendChild(row);
     }
-);
+}
 
-document.getElementById("packageSearch").addEventListener(
-    "input", function() {
-        renderPackages(this.value);
-    }
-);
+function renderPerformance(data) {
+    let list = document.getElementById("performanceList");
+    list.innerHTML = "";
 
-document.getElementById("profileSearch").addEventListener(
-    "input", function() {
-        renderProfiles(this.value);
+    if (data.length === 0) {
+        list.innerHTML = '<p class="chart-empty">No collection data available.</p>';
+        return;
     }
-);
+
+    let statuses = ["Completed", "Scheduled", "In Progress", "Missed"];
+
+    for (let i = 0; i < statuses.length; i++) {
+        let count = data.filter(item => item.status === statuses[i]).length;
+
+        let row = document.createElement("div");
+        row.className = "performance-row";
+
+        let label = document.createElement("span");
+        label.textContent = statuses[i];
+
+        let value = document.createElement("strong");
+        value.textContent = count;
+
+        row.append(label, value);
+        list.appendChild(row);
+    }
+}
+
+function renderRanking(data) {
+    let list = document.getElementById("locationRanking");
+    list.innerHTML = "";
+
+    let locations = {};
+
+    data.forEach(function(item) {
+        locations[item.location] = (locations[item.location] || 0) +
+            Number(item.weight);
+    });
+
+    let ranking = Object.entries(locations)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5);
+
+    if (ranking.length === 0) {
+        list.innerHTML = '<p class="chart-empty">No location data available.</p>';
+        return;
+    }
+
+    for (let i = 0; i < ranking.length; i++) {
+        let row = document.createElement("div");
+        row.className = "performance-row";
+
+        let label = document.createElement("span");
+        label.textContent = (i + 1) + ". " + ranking[i][0];
+
+        let value = document.createElement("strong");
+        value.textContent = ranking[i][1].toLocaleString() + " kg";
+
+        row.append(label, value);
+        list.appendChild(row);
+    }
+}
 
 function renderAll() {
-    renderPackages(document.getElementById("packageSearch").value);
-    renderProfiles(document.getElementById("profileSearch").value);
+    renderLocations();
+    renderCollections();
+    renderStats();
+    renderAnalytics();
 }
+
+document.getElementById("collectionForm").addEventListener("submit",
+    function(event) {
+        event.preventDefault();
+
+        let collection = {
+            id: "WC" + Date.now(),
+            date: document.getElementById("collectionDate").value,
+            location: document.getElementById("location").value.trim(),
+            collector: document.getElementById("collector").value.trim(),
+            type: document.getElementById("wasteType").value,
+            vehicle: document.getElementById("vehicle").value.trim(),
+            weight: Number(document.getElementById("weight").value),
+            status: document.getElementById("status").value
+        };
+
+        collections.push(collection);
+        saveCollections();
+
+        this.reset();
+        document.getElementById("collectionFormBox").hidden = true;
+
+        renderAll();
+    }
+);
+
+document.getElementById("searchCollection")
+    .addEventListener("input", renderCollections);
+
+document.getElementById("filterLocation")
+    .addEventListener("change", renderCollections);
+
+document.getElementById("filterType")
+    .addEventListener("change", renderCollections);
+
+document.getElementById("filterStatus")
+    .addEventListener("change", renderCollections);
+
+document.getElementById("analyticsPeriod")
+    .addEventListener("change", renderAnalytics);
 
 renderAll();
