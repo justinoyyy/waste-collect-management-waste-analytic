@@ -1,0 +1,229 @@
+
+let packages = JSON.parse(localStorage.getItem("packages")) || [];
+let profiles = JSON.parse(localStorage.getItem("profiles")) || [];
+
+function showPage(pageId, button) {
+    document.querySelectorAll(".page").forEach(function(page) {
+        page.hidden = page.id !== pageId;
+    });
+
+    document.querySelectorAll(".nav-btn").forEach(function(btn) {
+        btn.classList.remove("active");
+    });
+
+    button.classList.add("active");
+}
+
+function toggleForm(formId) {
+    let form = document.getElementById(formId);
+    form.hidden = !form.hidden;
+}
+
+function saveData() {
+    localStorage.setItem("packages", JSON.stringify(packages));
+    localStorage.setItem("profiles", JSON.stringify(profiles));
+}
+
+function addRow(list, values, deleteFunction) {
+    let row = document.createElement("tr");
+
+    for (let i = 0; i < values.length; i++) {
+        let cell = document.createElement("td");
+        cell.textContent = values[i];
+        row.appendChild(cell);
+    }
+
+    let actionCell = document.createElement("td");
+    let button = document.createElement("button");
+
+    button.textContent = "Delete";
+    button.className = "delete-btn";
+
+    button.addEventListener("click", deleteFunction);
+
+    actionCell.appendChild(button);
+    row.appendChild(actionCell);
+    list.appendChild(row);
+}
+
+function renderPackages(search = "") {
+    let list = document.getElementById("packageList");
+    let empty = document.getElementById("packageEmpty");
+
+    list.innerHTML = "";
+
+    let filtered = packages.filter(function(item) {
+        return (
+            item.name + " " +
+            item.code + " " +
+            item.description
+        ).toLowerCase().includes(search.toLowerCase());
+    });
+
+    for (let i = 0; i < filtered.length; i++) {
+        let item = filtered[i];
+
+        addRow(list, [
+            item.name,
+            item.code,
+            item.description
+        ], function() {
+            packages = packages.filter(function(pkg) {
+                return pkg.id !== item.id;
+            });
+
+            saveData();
+            renderAll();
+        });
+    }
+
+    empty.hidden = filtered.length > 0;
+
+    empty.textContent = packages.length === 0
+        ? "No packages added yet."
+        : "No matching packages found.";
+
+    document.getElementById("packageCount").textContent =
+        packages.length;
+
+    document.getElementById("packageCodeCount").textContent =
+        new Set(packages.map(item => item.code.toLowerCase())).size;
+}
+
+function renderProfiles(search = "") {
+    let list = document.getElementById("profileList");
+    let empty = document.getElementById("profileEmpty");
+
+    list.innerHTML = "";
+
+    let filtered = profiles.filter(function(item) {
+        return (
+            item.name + " " +
+            item.email + " " +
+            item.role + " " +
+            item.department
+        ).toLowerCase().includes(search.toLowerCase());
+    });
+
+    for (let i = 0; i < filtered.length; i++) {
+        let item = filtered[i];
+
+        addRow(list, [
+            item.name,
+            item.email,
+            item.role,
+            item.department
+        ], function() {
+            profiles = profiles.filter(function(profile) {
+                return profile.id !== item.id;
+            });
+
+            saveData();
+            renderAll();
+        });
+    }
+
+    empty.hidden = filtered.length > 0;
+
+    empty.textContent = profiles.length === 0
+        ? "No profiles added yet."
+        : "No matching profiles found.";
+
+    document.getElementById("profileCount").textContent =
+        profiles.length;
+
+    document.getElementById("adminCount").textContent =
+        profiles.filter(item => item.role === "Administrator").length;
+
+    document.getElementById("departmentCount").textContent =
+        new Set(
+            profiles.map(item => item.department.toLowerCase())
+        ).size;
+}
+
+document.getElementById("packageForm").addEventListener(
+    "submit", function(event) {
+        event.preventDefault();
+
+        let name = document.getElementById("packageName").value.trim();
+        let code = document.getElementById("packageCode").value.trim();
+        let description = document.getElementById("packageDescription").value.trim();
+
+        let duplicate = packages.some(function(item) {
+            return item.code.toLowerCase() === code.toLowerCase();
+        });
+
+        if (duplicate) {
+            alert("Package code already exists.");
+            return;
+        }
+
+        packages.push({
+            id: Date.now() + Math.random(),
+            name: name,
+            code: code,
+            description: description
+        });
+
+        saveData();
+        this.reset();
+
+        document.getElementById("packageFormBox").hidden = true;
+
+        renderAll();
+    }
+);
+
+document.getElementById("profileForm").addEventListener(
+    "submit", function(event) {
+        event.preventDefault();
+
+        let name = document.getElementById("fullName").value.trim();
+        let email = document.getElementById("email").value.trim();
+        let role = document.getElementById("role").value;
+        let department = document.getElementById("department").value.trim();
+
+        let duplicate = profiles.some(function(item) {
+            return item.email.toLowerCase() === email.toLowerCase();
+        });
+
+        if (duplicate) {
+            alert("Email address already exists.");
+            return;
+        }
+
+        profiles.push({
+            id: Date.now() + Math.random(),
+            name: name,
+            email: email,
+            role: role,
+            department: department
+        });
+
+        saveData();
+        this.reset();
+
+        document.getElementById("profileFormBox").hidden = true;
+
+        renderAll();
+    }
+);
+
+document.getElementById("packageSearch").addEventListener(
+    "input", function() {
+        renderPackages(this.value);
+    }
+);
+
+document.getElementById("profileSearch").addEventListener(
+    "input", function() {
+        renderProfiles(this.value);
+    }
+);
+
+function renderAll() {
+    renderPackages(document.getElementById("packageSearch").value);
+    renderProfiles(document.getElementById("profileSearch").value);
+}
+
+renderAll();
