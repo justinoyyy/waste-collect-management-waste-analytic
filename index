@@ -1,0 +1,239 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Package and Profile Management</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <h2>Package &amp;<br>Profile Management</h2>
+
+        <nav>
+            <button class="nav-btn active"
+                onclick="showPage('packagePage', this)">
+                ▦ Package Diagram
+            </button>
+
+            <button class="nav-btn"
+                onclick="showPage('profilePage', this)">
+                ♙ Profile Diagram
+            </button>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+
+        <!-- PACKAGE DIAGRAM -->
+        <section id="packagePage" class="page active-page">
+
+            <header class="page-header">
+                <div>
+                    <h1>Package Diagram</h1>
+                    <p>Manage and organize system packages.</p>
+                </div>
+
+                <button class="primary-btn" onclick="toggleForm('packageFormBox')">
+                    + Add Package
+                </button>
+            </header>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <p>Total Packages</p>
+                    <h2 id="packageCount">0</h2>
+                </div>
+
+                <div class="stat-card">
+                    <p>Unique Codes</p>
+                    <h2 id="packageCodeCount">0</h2>
+                </div>
+            </div>
+
+            <div class="card form-card" id="packageFormBox" hidden>
+                <h2>＋ Add a package</h2>
+
+                <form id="packageForm">
+                    <div class="form-grid">
+                        <div>
+                            <label for="packageName">Package name</label>
+                            <input type="text" id="packageName"
+                                placeholder="Package name" required>
+                        </div>
+
+                        <div>
+                            <label for="packageCode">Package code</label>
+                            <input type="text" id="packageCode"
+                                placeholder="Package code" required>
+                        </div>
+
+                        <div class="full">
+                            <label for="packageDescription">Description</label>
+                            <input type="text" id="packageDescription"
+                                placeholder="Package description" required>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="secondary-btn"
+                            onclick="toggleForm('packageFormBox')">
+                            Cancel
+                        </button>
+
+                        <button type="submit" class="primary-btn">
+                            Save Package
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card">
+                <div class="card-heading">
+                    <h2>Package Records</h2>
+
+                    <input type="search" id="packageSearch"
+                        placeholder="Search package...">
+                </div>
+
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Package name</th>
+                                <th>Package code</th>
+                                <th>Description</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="packageList"></tbody>
+                    </table>
+                </div>
+
+                <p id="packageEmpty" class="empty">
+                    No packages added yet.
+                </p>
+            </div>
+
+        </section>
+
+        <!-- PROFILE DIAGRAM -->
+        <section id="profilePage" class="page" hidden>
+
+            <header class="page-header">
+                <div>
+                    <h1>Profile Diagram</h1>
+                    <p>Manage user profiles, roles, and departments.</p>
+                </div>
+
+                <button class="primary-btn" onclick="toggleForm('profileFormBox')">
+                    + Add Profile
+                </button>
+            </header>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <p>Total Profiles</p>
+                    <h2 id="profileCount">0</h2>
+                </div>
+
+                <div class="stat-card">
+                    <p>Administrators</p>
+                    <h2 id="adminCount">0</h2>
+                </div>
+
+                <div class="stat-card">
+                    <p>Departments</p>
+                    <h2 id="departmentCount">0</h2>
+                </div>
+            </div>
+
+            <div class="card form-card" id="profileFormBox" hidden>
+                <h2>＋ Add a profile</h2>
+
+                <form id="profileForm">
+                    <div class="form-grid">
+                        <div>
+                            <label for="fullName">Full name</label>
+                            <input type="text" id="fullName"
+                                placeholder="Full name" required>
+                        </div>
+
+                        <div>
+                            <label for="email">Email address</label>
+                            <input type="email" id="email"
+                                placeholder="Email address" required>
+                        </div>
+
+                        <div>
+                            <label for="role">Role</label>
+                            <select id="role" required>
+                                <option value="">Select role</option>
+                                <option>Administrator</option>
+                                <option>Manager</option>
+                                <option>Staff</option>
+                                <option>Member</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="department">Department</label>
+                            <input type="text" id="department"
+                                placeholder="Department" required>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="secondary-btn"
+                            onclick="toggleForm('profileFormBox')">
+                            Cancel
+                        </button>
+
+                        <button type="submit" class="primary-btn">
+                            Save Profile
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card">
+                <div class="card-heading">
+                    <h2>Profile Records</h2>
+
+                    <input type="search" id="profileSearch"
+                        placeholder="Search name, role, or email...">
+                </div>
+
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Full name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Department</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="profileList"></tbody>
+                    </table>
+                </div>
+
+                <p id="profileEmpty" class="empty">
+                    No profiles added yet.
+                </p>
+            </div>
+
+        </section>
+
+        <footer>Package and Profile Management System</footer>
+
+    </main>
+
+</body>
+</html>
