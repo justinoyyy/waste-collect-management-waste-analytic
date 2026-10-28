@@ -4,197 +4,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Package and Profile Management</title>
+    <title>Waste Management System</title>
     <link rel="stylesheet" href="style.css">
     <script src="script.js" defer></script>
 </head>
 <body>
 
     <aside class="sidebar">
-        <h2>Package &amp;<br>Profile Management</h2>
+        <h2>♻ Waste<br>Management</h2>
 
         <nav>
-            <button class="nav-btn active"
-                onclick="showPage('packagePage', this)">
-                ▦ Package Diagram
+            <button class="nav-link active"
+                onclick="showPage('management', this)">
+                Waste Collection Management
             </button>
 
-            <button class="nav-btn"
-                onclick="showPage('profilePage', this)">
-                ♙ Profile Diagram
+            <button class="nav-link"
+                onclick="showPage('analytics', this)">
+                Waste Analytics
             </button>
         </nav>
     </aside>
 
     <main class="main-content">
 
-        <!-- PACKAGE DIAGRAM -->
-        <section id="packagePage" class="page active-page">
-
+        <!-- WASTE COLLECTION MANAGEMENT -->
+        <section id="management" class="page">
             <header class="page-header">
                 <div>
-                    <h1>Package Diagram</h1>
-                    <p>Manage and organize system packages.</p>
+                    <h1>Waste Collection Management</h1>
+                    <p>Manage and monitor waste collection activities.</p>
                 </div>
 
-                <button class="primary-btn" onclick="toggleForm('packageFormBox')">
-                    + Add Package
+                <button class="primary-btn" onclick="toggleForm()">
+                    + Add Collection
                 </button>
             </header>
 
             <div class="stats-grid">
                 <div class="stat-card">
-                    <p>Total Packages</p>
-                    <h2 id="packageCount">0</h2>
+                    <p>Total</p>
+                    <h2 id="totalCount">0</h2>
                 </div>
 
                 <div class="stat-card">
-                    <p>Unique Codes</p>
-                    <h2 id="packageCodeCount">0</h2>
+                    <p>Scheduled</p>
+                    <h2 id="scheduledCount">0</h2>
+                </div>
+
+                <div class="stat-card">
+                    <p>In Progress</p>
+                    <h2 id="progressCount">0</h2>
+                </div>
+
+                <div class="stat-card">
+                    <p>Completed</p>
+                    <h2 id="completedCount">0</h2>
+                </div>
+
+                <div class="stat-card">
+                    <p>Missed</p>
+                    <h2 id="missedCount">0</h2>
                 </div>
             </div>
 
-            <div class="card form-card" id="packageFormBox" hidden>
-                <h2>＋ Add a package</h2>
+            <div class="card collection-form" id="collectionFormBox" hidden>
+                <h2>＋ Schedule a collection</h2>
 
-                <form id="packageForm">
+                <form id="collectionForm">
                     <div class="form-grid">
                         <div>
-                            <label for="packageName">Package name</label>
-                            <input type="text" id="packageName"
-                                placeholder="Package name" required>
+                            <label for="collectionDate">Collection date</label>
+                            <input type="date" id="collectionDate" required>
                         </div>
 
                         <div>
-                            <label for="packageCode">Package code</label>
-                            <input type="text" id="packageCode"
-                                placeholder="Package code" required>
-                        </div>
-
-                        <div class="full">
-                            <label for="packageDescription">Description</label>
-                            <input type="text" id="packageDescription"
-                                placeholder="Package description" required>
-                        </div>
-                    </div>
-
-                    <div class="form-actions">
-                        <button type="button" class="secondary-btn"
-                            onclick="toggleForm('packageFormBox')">
-                            Cancel
-                        </button>
-
-                        <button type="submit" class="primary-btn">
-                            Save Package
-                        </button>
-                    </div>
-                </form>
-            </div>
-
-            <div class="card">
-                <div class="card-heading">
-                    <h2>Package Records</h2>
-
-                    <input type="search" id="packageSearch"
-                        placeholder="Search package...">
-                </div>
-
-                <div class="table-wrap">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Package name</th>
-                                <th>Package code</th>
-                                <th>Description</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-
-                        <tbody id="packageList"></tbody>
-                    </table>
-                </div>
-
-                <p id="packageEmpty" class="empty">
-                    No packages added yet.
-                </p>
-            </div>
-
-        </section>
-
-        <!-- PROFILE DIAGRAM -->
-        <section id="profilePage" class="page" hidden>
-
-            <header class="page-header">
-                <div>
-                    <h1>Profile Diagram</h1>
-                    <p>Manage user profiles, roles, and departments.</p>
-                </div>
-
-                <button class="primary-btn" onclick="toggleForm('profileFormBox')">
-                    + Add Profile
-                </button>
-            </header>
-
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <p>Total Profiles</p>
-                    <h2 id="profileCount">0</h2>
-                </div>
-
-                <div class="stat-card">
-                    <p>Administrators</p>
-                    <h2 id="adminCount">0</h2>
-                </div>
-
-                <div class="stat-card">
-                    <p>Departments</p>
-                    <h2 id="departmentCount">0</h2>
-                </div>
-            </div>
-
-            <div class="card form-card" id="profileFormBox" hidden>
-                <h2>＋ Add a profile</h2>
-
-                <form id="profileForm">
-                    <div class="form-grid">
-                        <div>
-                            <label for="fullName">Full name</label>
-                            <input type="text" id="fullName"
-                                placeholder="Full name" required>
+                            <label for="location">Collection location</label>
+                            <input type="text" id="location"
+                                placeholder="Area, street, or route" required>
                         </div>
 
                         <div>
-                            <label for="email">Email address</label>
-                            <input type="email" id="email"
-                                placeholder="Email address" required>
+                            <label for="collector">Assigned collector</label>
+                            <input type="text" id="collector"
+                                placeholder="Collector name" required>
                         </div>
 
                         <div>
-                            <label for="role">Role</label>
-                            <select id="role" required>
-                                <option value="">Select role</option>
-                                <option>Administrator</option>
-                                <option>Manager</option>
-                                <option>Staff</option>
-                                <option>Member</option>
+                            <label for="vehicle">Vehicle</label>
+                            <input type="text" id="vehicle"
+                                placeholder="Vehicle or plate number" required>
+                        </div>
+
+                        <div>
+                            <label for="wasteType">Waste type</label>
+                            <select id="wasteType" required>
+                                <option value="">Select waste type</option>
+                                <option>Biodegradable</option>
+                                <option>Recyclable</option>
+                                <option>Residual</option>
+                                <option>Hazardous</option>
                             </select>
                         </div>
 
                         <div>
-                            <label for="department">Department</label>
-                            <input type="text" id="department"
-                                placeholder="Department" required>
+                            <label for="weight">Weight (kg)</label>
+                            <input type="number" id="weight"
+                                min="0.1" step="0.1"
+                                placeholder="Enter weight" required>
+                        </div>
+
+                        <div>
+                            <label for="status">Status</label>
+                            <select id="status" required>
+                                <option value="Scheduled">Scheduled</option>
+                                <option value="In Progress">In Progress</option>
+                                <option value="Completed">Completed</option>
+                                <option value="Missed">Missed</option>
+                            </select>
                         </div>
                     </div>
 
                     <div class="form-actions">
                         <button type="button" class="secondary-btn"
-                            onclick="toggleForm('profileFormBox')">
+                            onclick="toggleForm()">
                             Cancel
                         </button>
 
                         <button type="submit" class="primary-btn">
-                            Save Profile
+                            Save Collection
                         </button>
                     </div>
                 </form>
@@ -202,36 +140,119 @@
 
             <div class="card">
                 <div class="card-heading">
-                    <h2>Profile Records</h2>
+                    <h2>Collection Records</h2>
+                    <input type="search" id="searchCollection"
+                        placeholder="Search collection...">
+                </div>
 
-                    <input type="search" id="profileSearch"
-                        placeholder="Search name, role, or email...">
+                <div class="filters">
+                    <select id="filterLocation">
+                        <option value="">All Locations</option>
+                    </select>
+
+                    <select id="filterType">
+                        <option value="">All Waste Types</option>
+                        <option>Biodegradable</option>
+                        <option>Recyclable</option>
+                        <option>Residual</option>
+                        <option>Hazardous</option>
+                    </select>
+
+                    <select id="filterStatus">
+                        <option value="">All Status</option>
+                        <option>Scheduled</option>
+                        <option>In Progress</option>
+                        <option>Completed</option>
+                        <option>Missed</option>
+                    </select>
                 </div>
 
                 <div class="table-wrap">
                     <table>
                         <thead>
                             <tr>
-                                <th>Full name</th>
-                                <th>Email</th>
-                                <th>Role</th>
-                                <th>Department</th>
+                                <th>ID</th>
+                                <th>Date</th>
+                                <th>Location</th>
+                                <th>Collector</th>
+                                <th>Type</th>
+                                <th>Vehicle</th>
+                                <th>Weight</th>
+                                <th>Status</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
 
-                        <tbody id="profileList"></tbody>
+                        <tbody id="collectionList"></tbody>
                     </table>
                 </div>
 
-                <p id="profileEmpty" class="empty">
-                    No profiles added yet.
+                <p id="emptyMessage" class="empty-message">
+                    No collections scheduled yet.
                 </p>
             </div>
-
         </section>
 
-        <footer>Package and Profile Management System</footer>
+        <!-- WASTE ANALYTICS -->
+        <section id="analytics" class="page" hidden>
+            <header class="page-header">
+                <div>
+                    <h1>Waste Analytics</h1>
+                    <p>Analyze waste collection data and performance.</p>
+                </div>
+
+                <select id="analyticsPeriod" class="period-select">
+                    <option value="month">This Month</option>
+                    <option value="all">All Records</option>
+                </select>
+            </header>
+
+            <div class="stats-grid analytics-stats">
+                <div class="stat-card">
+                    <p>Total Waste</p>
+                    <h2 id="totalWaste">0 kg</h2>
+                </div>
+
+                <div class="stat-card">
+                    <p>Average Daily</p>
+                    <h2 id="averageWaste">0 kg</h2>
+                </div>
+
+                <div class="stat-card">
+                    <p>Recyclable</p>
+                    <h2 id="recyclableWaste">0 kg</h2>
+                </div>
+
+                <div class="stat-card">
+                    <p>Collection Efficiency</p>
+                    <h2 id="efficiency">0%</h2>
+                </div>
+            </div>
+
+            <div class="analytics-grid">
+                <div class="card chart-card">
+                    <h2>Waste Collection Trend</h2>
+                    <div id="trendChart" class="bar-chart"></div>
+                </div>
+
+                <div class="card chart-card">
+                    <h2>Waste by Category</h2>
+                    <div id="categoryChart"></div>
+                </div>
+
+                <div class="card performance-card">
+                    <h2>Collection Performance</h2>
+                    <div id="performanceList"></div>
+                </div>
+
+                <div class="card performance-card">
+                    <h2>Top Waste Locations</h2>
+                    <div id="locationRanking"></div>
+                </div>
+            </div>
+        </section>
+
+        <footer>Waste Management System</footer>
 
     </main>
 
